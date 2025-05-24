@@ -1,0 +1,55 @@
+<!-- Form to update an existing Todo -->
+
+{%extends "base.html"%}
+
+{%block title%}
+    Update Todo
+{% endblock %}
+
+{%block extra_header%}
+<!-- Javascript for form validation -->
+<script src="{{url_for('static',filename='form.js')}} " defer></script>
+{%endblock%}
+    
+{%block content%}
+        <div>
+            <h5 class="h5 text-center mt-3">Update your Todo</h5>
+        </div>
+        <!-- Justify the form in the center -->
+        <div class="d-flex justify-content-center">
+            <form  method="POST" class="p4 w-50">
+                {{ form.hidden_tag() }} <!-- CSRF token-->
+                <div class = 'row '>
+                    <!-- Title : required, maxlength :100, default value : previous title-->
+                    <label for="title" class="col-form-label"><strong>Task</strong></label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{Todo.query.get(todo_id).title}}" required maxlength="100">
+                    <div class = "mt-2 d-none custom-validation" id="titleValidation"></div>
+
+                </div>
+
+                <div class="row">
+                    <!-- dueTime : required, min = created time, default value : previous due time -->
+                    <label for="dueTime" class="col-form-label mt-3"><strong>Due Date and time</strong></label>
+                    <input type="datetime-local" class="form-control" id="dueTime" name="due_time" 
+                    value="{{Todo.query.get(todo_id).due_time}}" min="{{ created_time.strftime('%Y-%m-%dT%H:%M') }}" required >
+
+                    <input type="hidden" id="createdTime" value="{{ created_time.strftime('%Y-%m-%dT%H:%M') }}">
+
+                    <div class = "mt-2 d-none custom-validation" id="dueTimeValidation"></div>
+
+                    
+                </div>
+
+                <!-- Submit button -->
+                <div class="d-flex mt-5">
+                    <button class="btn btn-primary " type="submit" id="submit">Update</button>
+                    <a class="btn btn-danger  ms-2" href="{{url_for('main.list')}}" >Cancel</a>
+                    <small class="xs ms-2 mt-2 text-muted">
+                    Created: {{created_time.strftime('%Y-%m-%d %H:%M')}}
+                    </small>
+                </div>
+
+            </form>
+        </div>
+        
+{% endblock %}

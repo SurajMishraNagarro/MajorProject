@@ -1,0 +1,28 @@
+# Ignore Python virtual environment
+venv/
+.venv/
+.todovenv/
+
+
+# Byte-compiled / cached Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs and database files
+*.log
+*.sqlite3
+*.db
+
+
+
+newfile.txt
+
+
+.env
+NextWork
+instance
+
+
+secrets.yaml

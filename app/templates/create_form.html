@@ -1,0 +1,53 @@
+<!-- Form to input a new Todo -->
+
+{%extends "base.html"%}
+
+{%block title%}
+    Add Todo
+{% endblock %}
+{%block extra_header%}
+
+<!-- Javascript for form validation -->
+<script src="{{url_for('static',filename='form.js')}} " defer></script>
+
+{%endblock%}
+    
+{%block content%}
+
+        <div>
+            <h5 class="h5 text-center mt-3">Add new entry</h5>
+        </div>
+        
+        <!-- Justify the form in center -->
+        <div class="d-flex justify-content-center">
+            <form  method="POST" class="p4 w-50">
+                {{ form.hidden_tag() }} <!-- Csrf token-->
+
+                <!-- Todo title and title validation -->
+                <div class = 'row '>
+                    <label for = "title" class="col-form-label"><strong>Task</strong></label>
+                    <input type = "text" class="form-control" id="title" name="title" required maxlength="100">
+                    <div class = "mt-2 d-none custom-validation" id="titleValidation"></div>
+                </div>
+
+                <!-- Due date and time input and validation -->
+                <div class="row">
+                    <label for="dueTime" class="col-form-label mt-3"><strong>Due Date and time</strong></label>
+                    <input type="datetime-local" class="form-control" id="dueTime" name="due_time" 
+                    min="{{ current_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+                    
+                    <div class = "mt-2 d-none custom-validation" id="dueTimeValidation"></div>
+                </div>
+
+                <!-- Submit button -->
+                <div class="d-flex">
+                    <button class="btn btn-primary mt-5 disabled-btn " type="submit" id="submit" disabled>Create</button>
+                    <a class="btn btn-danger mt-5 ms-2" href="{{url_for('main.list')}}" >Cancel</a>
+
+                </div>
+
+
+            </form>
+        </div>
+        
+{% endblock %}

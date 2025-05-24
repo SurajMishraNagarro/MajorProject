@@ -1,0 +1,48 @@
+# Default values for python-app - Kops Configuration
+
+app:
+  name: python-app
+
+namespace: python-app-ns 
+
+replicaCount: 3
+
+image:
+  repository: surajmishra07/py_proj
+  pullPolicy: Always
+  tag: "latest"
+
+service:
+  portName: http
+  type: LoadBalancer 
+  port: 9091
+  targetPort: 9090
+
+persistence:
+  enabled: true
+  storageClass: gp2
+  size: 1Gi
+  mountPath: "/app/instance"
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+serviceMonitor:
+  enabled: true
+  path: /metrics
+  interval: 15s
+  namespace: monitoring
+  targetNamespace: python-app-ns
+  labels:
+    release: prometheus-stack
+    app: kube-prometheus-stack
+  release: prometheus-stack
+  app: kube-prometheus-stack
+
+aws:
+  region: us-east-1

@@ -1,0 +1,100 @@
+<!-- Sign Up -->
+
+{% extends 'base.html' %}
+
+{% block title %}
+Signup
+{% endblock %}
+{%block extra_header%}
+<script src="{{url_for('static',filename='signup.js')}}" defer></script>
+{%endblock%}
+
+{% block content %}
+
+<div class="container d-flex justify-content-center  mt-5" >
+    <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+        <h4 class="text-center mb-3">Create an Account</h4>
+        <form id="form" method="POST">
+            {{ form.hidden_tag() }}
+            <div id='signUpSuccess'class="d-none alert alert-success">Account Created succesfully</div> 
+
+            <!-- First Name-->
+            <div class="mb-3">
+                <!-- <label for="first_name" class="form-label">First Name</label> -->
+                <input type="text" class="form-control name mb-2" id="firstName" name="first_name" placeholder="First Name">
+                <div id="firstNameValidation" class="d-none text-danger custom-validation mb-1">
+                    <!-- FirstName Validation message -->
+                </div>
+            </div>
+
+
+            <!-- Middle Name -->
+            <div class="mb-3">
+                <!-- <label for="middle_name" class="form-label">Middle Name</label> -->
+                <input type="text" class="form-control name mb-2" id="middleName" name="middle_name" placeholder="Middle Name">
+                
+                <div id="middleNameValidation" class="d-none text-danger custom-validation mb-1">
+                    <!-- MiddleName Validation message -->
+                </div>
+            </div>
+            
+
+            <!-- Last Name -->
+            <div class="mb-3">
+                <!-- <label for="last_name" class="form-label">Last Name</label> -->
+                <input type="text" class="form-control name mb-2" id="lastName" name="last_name" placeholder="Last Name">
+                <div id="lastNameValidation" class="d-none text-danger custom-validation mb-1">
+                    <!-- LastName Validation message -->
+                </div>
+            </div>
+            
+
+            <!-- Username -->
+            <div class="mb-3">
+                <!-- <label for="user_name" class="form-label">Username</label> -->
+                <input type="text" class="form-control mb-2" id="userName" name="user_name" placeholder="Username">
+                <script>
+                    const checkUserNameURL = "{{ url_for('auth.check_user_name') }}";  
+                </script>
+            <div id='userNameValidation' class="d-none custom-validation text-danger">
+                <input type="hidden" id="csrf_token" value="{{form.csrf_token}}">
+                <!-- userName Validation message -->
+            </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <!-- <label for="password" class="form-label">Password</label> -->
+                <input type="password" class="form-control mb-2" id="password" name="password" placeholder="Password">
+                <div id="passwordValidation">
+                    <div id='passwordValidationLength' class="d-none custom-validation mb-1">
+                        <!-- password length Validation message -->
+                    </div>
+                    <div id='passwordValidationRegex' class="d-none custom-validation ">
+                        <!-- password length Validation message -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Confirm Password -->
+            <div class="mb-3">
+                <!-- <label for="confirm_password" class="form-label">Confirm Password</label> -->
+                <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Confirm Password">
+            </div>
+            <div id='confirmPasswordValidation' class="d-none custom-validation mb-2">
+                <!--confirmPassword Validation message -->
+            </div>
+            
+
+
+            <!-- Submit Button -->
+            <button type="submit" id="submit" class="btn btn-primary w-100 disabled-btn" disabled>Create Profile</button>
+            <script>
+                const signupURL="{{url_for('auth.signup')}}"
+            </script>
+        </form>
+    <small class="text-muted text-center mt-3">Already have an account : <a class="text-primary" href="{{url_for('auth.login')}}">login</a></small>
+    
+    </div>
+</div>
+{% endblock %}

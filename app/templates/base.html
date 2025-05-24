@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width = device-width,initial-scale=1.0">
+        <title>{%block title%}{%endblock%}</title>
+
+        <!-- Bootstrap JS (Required for Dropdown in List.html) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Font Awesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        
+        <!-- bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        
+        <!-- Custom CSS -->
+        <link href="{{ url_for('static',filename='styles.css')}}" rel="stylesheet" type="text/css">
+        
+        <!-- Poppins Font Family -->
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+        <!-- For Adding more to the head tag -->
+        {%block extra_header%}{%endblock%}
+    </head>
+
+    <body>
+        <header class="pb-1 pt-1 mb-4 bg-light border-bottom">
+            <nav class="container d-flex justify-content-between align-items-center">
+                
+                <!-- Home Button (Left) -->
+                <a href="{{ url_for('main.list') }}" class="btn">
+                    <i class="fa-solid fa-house"></i> <strong>Home</strong>
+                </a>
+        
+                <!-- Centered Title -->
+                <h1 class="m-auto text-center flex-grow-1" 
+                    style="font-family: 'Poppins', sans-serif; font-weight: 600; letter-spacing: 1px;">
+                    To Do Manager
+                </h1>
+        
+                <!-- Logout Button (Right) -->
+                <div class="{%if not current_user.is_authenticated%} invisible {%endif%}">
+                    <a class="btn btn-danger ms-3" href="{{ url_for('auth.logout') }}">Logout</a>
+                </div>
+
+                
+            </nav>
+        </header>
+    
+        {% block content %}{% endblock %}
+    </body>
+    
+</html>

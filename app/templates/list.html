@@ -1,0 +1,168 @@
+<!-- Lists the Todo for the current User -->
+
+<!-- extends base.html for consistency in layouts and including the external scripts -->
+{% extends "base.html" %}
+
+{% block title %} Todo List {% endblock %}
+
+<!-- auto refreshes every 10 seconds to keep the data updated -->
+{%block extra_header%} <meta http-equiv="refresh" content="10"> {%endblock%}
+
+{% block content %}
+
+<!-- Main container for the page -->
+<div class="container mt-2"></div>
+
+    <!-- Div for the greetings and headers -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-4 mb-4">
+
+        <!-- Left: Greeting -->
+        <h2 class="ms-4">Hi {{ first_name.capitalize() }}</h2>
+    
+        <!-- Center: Todo List Message & Sort Dropdown -->
+        <div class="d-flex justify-content-center flex-grow-1 align-items-center">
+            {% if todos.count() == 0 %}
+                <h2 class="text-center">No todos to display here!!</h2>
+            {% else %}
+                <h2 class="text-center m-0 me-3">Your Todo List</h2>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort By
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                        <!-- sets the sort argument for the URL  -->
+                        <li><a class="dropdown-item" href="?sort=due_time&todo_status={{ todo_status }}">Time left</a></li>
+                        <li><a class="dropdown-item" href="?sort=created_time&todo_status={{ todo_status }}">Created Time</a></li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    
+        <!-- Right: Todo Summary Icons and filters -->
+        <div class="d-flex align-items-center gap-3 flex-wrap me-4">
+            <!-- show the number and filter by deadlined todos only if count>0 -->
+            {% if deadlined_todos_count != 0 %}
+                <div>
+                    <a style="text-decoration: none;" href="?todo_status=d">
+                        <i class="text-danger fa-solid fa-circle-exclamation hover-scale" title="View deadlined Todos"></i> 
+                    </a>{{ deadlined_todos_count }}
+                </div>
+            {% endif %}
+
+            <!-- show the number and filter by urgent todos (due time within 1 hour) only if count>0 -->
+            {% if urgent_todos_count != 0 %}
+                <div>
+                    <a style="text-decoration: none;"  href="?todo_status=u">
+                        <i class="text-warning fa-solid fa-circle-exclamation hover-scale" title="View urgent todos"></i>
+                    </a>{{ urgent_todos_count }}
+                </div>
+            {% endif %}
+
+            <!-- show the number of pending tasks and also set the filter to see only pending tasks -->
+            <div>
+
+                <!-- set the url argument filter as 'p' to show pending tasks only -->
+                <a style="text-decoration: none;" href="?todo_status=p">
+                    <i class="text-info fa-solid fa-clock hover-scale" title="View pending tasks"></i>
+                </a> {{ pending }}
+            </div>
+
+            <!-- show the number of successfull tasks and also set the filter to see only pending tasks -->
+            <div>
+                <!-- set the url argument filter as 's' to show successfull tasks only -->
+                <a style="text-decoration: none;" href="?todo_status=s">
+                    <i class="text-success fa-solid fa-thumbs-up hover-scale" title="View successful tasks"></i>
+                </a> {{ success }}
+            </div>
+
+            <!-- show the number of failed tasks and also set the filter to see only failed tasks -->
+            <div>
+                <!-- set the url argument filter as 'f' to show unsuccessfull tasks only -->
+                <a style="text-decoration: none;"  href="?todo_status=f">
+                    <i class="text-danger fa-solid fa-thumbs-down hover-scale" title="View failed tasks"></i>
+                </a> {{ failure }}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Todo Button Centered -->
+<div class="text-center mt-4 mb-4">
+    <a href="{{ url_for('main.create') }}" class="btn btn-primary">
+        Add New Todo <i class="fa-solid fa-plus"></i>
+    </a>
+</div>
+    
+<!-- DIsplay the todos if todocount >0 -->
+{% if Todo.query.count()!=0 %}
+    
+        <div class="row ms-4">
+            {% for todo in todos %}
+            <div class="col-md-6 col-lg-4 mb-4">
+
+                {%set time_left =(todo.due_time - current_time).total_seconds() %}
+                <!-- change height and width to 350 and 160 px if problem occurs -->
+                <div style="width: 90% ; height: 95%; overflow: hidden;"
+                class="card shadow {%if todo_status=='p'%}{% if time_left <= 3600 and
+                     time_left>0 %} highlight-border-warning blink-effect 
+                     {%elif time_left<=0%} highlight-border-danger blink-effect{% endif %}{%endif%}
+                     hover-scale" >
+                    <div class="card-body  d-flex flex-column justify-content-between">
+                        <!-- Title (Clickable) -->
+                        <h6 class="card-title pb-2 text-truncate">
+                            <a href="{{ url_for('main.update', id=todo.todo_id) }}" 
+                            class="text-decoration-none" data-bs-toggle="tooltip" 
+                            data-bs-placement="top"  title="{{todo.title}}">
+                                {{ todo.title }}
+                            </a>
+                        </h6>
+                        <script> //to show the complete title when hovering over the Title
+                            document.addEventListener("DOMContentLoaded", function () {
+                                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                                });
+                            });
+                        </script>
+                        
+
+                        <!-- Due & Created Time -->
+                        <p class="card-text text-muted small">
+                            Due: {{ todo.due_time.strftime('%d-%m-%Y %H:%M') }} <br>
+                            Created: {{ todo.created_time.strftime('%d-%m-%Y %H:%M') }}
+                        </p> 
+                            
+
+                        <div class="mt-2 text-end">
+                            <a class="btn" href="{{url_for('main.update',id=todo.todo_id)}}">
+                                <i class="fa-solid fa-pen" title="edit"></i>
+                            </a>
+                           
+                            <a class="me-2 btn btn-info {%if todo_status=='p'%}d-none{%endif%}" href="{{url_for('main.pending',id=todo.todo_id)}}" title="mark pending">
+                                <i class="fa-solid fa-clock" ></i>
+                            </a>
+                            <a class="me-2 btn btn-success {%if todo_status=='s'%}d-none{%endif%}" href="{{url_for('main.success',id=todo.todo_id)}}" title="mark success">
+                                <i class="fa-solid fa-thumbs-up" ></i>
+                            </a>
+                            <a class="me-2 btn btn-danger {%if todo_status=='f'%}d-none{%endif%}" href="{{url_for('main.failure',id=todo.todo_id)}}" title="mark failure">
+                                <i class="fa-solid fa-thumbs-down" ></i>
+                            </a>
+                            
+                                
+                                
+
+                            <a class="text-decoration-none text-dark" href="{{ url_for('main.delete_todo', id=todo.todo_id,todo_status=todo_status) }}">
+                                <i class="fa-solid fa-trash" title="delete"></i>
+                            </a>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    
+    {% endif %}
+
+    
+</div>
+{% endblock %}

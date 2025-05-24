@@ -1,0 +1,85 @@
+/* Custom CSS for different pages */
+
+/* highlights the todo cards with deadline approaching */
+/* usage list.html */
+.highlight-border-warning {
+    border: 2px solid yellow !important;
+}
+
+/* highlights the deadlined todo cards  */
+/* usage list.html */
+.highlight-border-danger{
+    border: 2px solid red !important;
+}
+
+/* enlarges the todo card when hovered */
+/* usage list.html */
+.hover-scale:hover {
+    transform:scale(1.1);
+    transition: 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: 2; /* incase the todo overlaps with other elements */
+}
+
+/* blinking effect for urgent and deadlined todo */
+/* usage list.html */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.blink-effect {
+    animation: blink 0.3s ease-in-out 3; 
+}
+
+/* absolute positioning for the left most element in the page */
+/* not used  */
+.left-most{
+    position :absolute;
+    left: 50px;
+}
+.right-most{
+    position:absolute;
+    right : 50px;
+}
+
+
+/* aligns the items in center */
+.center {
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    /* height: 100vh; */
+}
+
+.validation{
+    display: flex;
+}
+
+/* sets the font for the entire text in the pages until explicity defined */
+/* usage */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* styling for the validation messages */
+/* usage : login.html, signup.html, create_form.html, update_form.html */
+.custom-validation {
+    font-size: 12px; /* Smaller font size */
+    font-family: Arial, sans-serif; /* Different from Poppins */
+}
+
+/* fade out alert messages */
+/* usage : to be included later on */
+.fade-out{
+    opacity: 0;
+    transition:opacity 1s ease-out;
+}
+
+/* styling for a disabled button  */
+/* usage signup.html */
+.disabled-btn {
+    background-color: grey !important;
+    border-color: grey !important;
+    pointer-events: none; /* Prevent clicks */
+}
+
+

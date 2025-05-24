@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "python-app.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "python-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "python-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "python-app.selectorLabels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.service.targetPort }}"
+        prometheus.io/path: "{{ .Values.serviceMonitor.path }}"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+          name: http
+        volumeMounts:
+        - name: sqlite-storage
+          mountPath: {{ .Values.persistence.mountPath }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: sqlite-storage
+        persistentVolumeClaim:
+          claimName: {{ include "python-app.fullname" . }}-pvc

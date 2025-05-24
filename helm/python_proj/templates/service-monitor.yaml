@@ -1,0 +1,25 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "python-app.fullname" . }}-monitor
+  namespace: {{ .Values.serviceMonitor.namespace | default .Values.namespace }}
+  labels:
+    {{- if .Values.serviceMonitor.labels }}
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+    release: {{ .Values.serviceMonitor.release | default "prometheus-stack" }}
+    app: {{ .Values.serviceMonitor.app | default "kube-prometheus-stack" }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.app.name }}
+      app.kubernetes.io/instance: {{ .Values.app.name }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.serviceMonitor.targetNamespace | default .Values.namespace }}
+  endpoints:
+  - port: {{ .Values.service.portName | default "http" }}
+    path: {{ .Values.serviceMonitor.path }}
+    interval: {{ .Values.serviceMonitor.interval }}
+{{- end }}
