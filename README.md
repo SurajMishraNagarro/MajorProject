@@ -1,144 +1,120 @@
-# Advanced Python Assignment - To do app in Flask
-## Overview
-This project "Todo app" demonstrates a full stack web application incorporating : 
-- __Backend__ : Flask
-- __Database__ : sqlite, Flask SQL alchemy, ORM 
-- __frontend__ : HTML, CSS, Javascript, bootstrap , font-awesome
-- __Authentication__ : Flask-login
-- __Forms__ : Flask-WTF
-- __Security__ : CSRF Protection,werkzeug(for password hashing),ORM (to prevent SQL injections)
-- __Jinja templates__ : for template inheritance and dynamic content from backend 
-- __Migrations__ : For database updates
 
-These technologies were binded together to create an interactive Todo App with __user authentication__, __CRUD operations__ and many more features as mentioned later .
+---
 
-## Project Structure
+# 🧩 Python To-Do Application – Production-Ready Kubernetes Deployment on AWS
+
+This repository contains the complete infrastructure and application setup for deploying a Python-based To-Do web application on a **highly available, production-grade Kubernetes cluster** on AWS, provisioned using **Kops** and managed via **Terraform**.
+
+It incorporates essential DevOps practices including **secure Docker image management**, **Helm-based deployment**, and **real-time monitoring using Prometheus and Grafana**.
+
+---
+
+## 📁 Repository Structure
 
 ```
-/Advanced Python Assignment  
-    .venv                       # Virtual environement
-
-    /app                        # Main app directory
-
-        /static                 # JS and CSS files
-            form.js             # JS for create and update 
-                                # forms
-
-            login.js            # JS for login.html
-            signup.js           # JS for signup.html
-            styles.css          # Custom css
-
-        /templates              # HTML files
-            base.html           # Base template with common 
-                                # layout
-
-            create_form.html    # form for new todo
-            list.html           # lists the todos for a user
-            login.html          # login page
-            signup.html         # signup page
-            update_form.html    # form for updating a todo
-
-        ## PYTHON FILES
-        auth.py                 # authentication related routes
-        routes.py               # Todo related routes
-        forms.py                # WT-forms     
-        models.py               # models used in the project
-        run.py                  # entry point
-        __init__.py             # Initializes the application
-
-    /instance  
-    /migration                  # db migrations
-    .env                        # environment variables
-    README.md                   # project Description 
-    requirements.txt            # venv requirements
+.
+├── Dockerfile                         # Container specification
+├── run.py                             # Application entry point
+├── requirements.txt                   # Python dependencies
+├── instance/users.db                  # SQLite database (for development/demo)
+├── app/                               # Application logic (Flask)
+│   ├── auth.py, forms.py, routes.py   # Auth, routing, form handlers
+│   ├── static/, templates/            # CSS, JS, HTML templates
+├── helm/                              # Helm chart for Kubernetes deployment
+│   └── python_proj/
+│       ├── Chart.yaml, values.yaml    # Helm configuration
+│       └── templates/                 # K8s manifests: deployment, service, etc.
+├── kops-cluster/
+│   └── kubernetes.tf                  # Terraform script to provision Kops cluster
+└── README.md
 ```
 
+---
 
+## 🔧 Infrastructure Overview
 
+### ✅ Kubernetes Provisioning with Kops (via Terraform)
 
-## Installation and Setup
+* **1 master + 1 worker** configuration for demonstration and testing purposes.
+* Cluster created and managed using **Terraform** for reproducibility and IaC (Infrastructure as Code).
+* AWS resources used: EC2, VPC, Route53 (DNS), S3 (Kops state store).
 
-### 1. Python
-- **Version**: 3.13  
-- **Download & Install**: [Python Official Site](https://www.python.org/downloads/)  
-- Verify installation:  
-  ```sh
-  python --version
-  ```
+### ✅ Docker Image Security
 
-### 2. Virtual Environment
-#### Installation
-- Install `venv`:
-  ```sh
-  python -m venv myenv
-  ```
-- Activate virtual environment:  
-  - **Windows**:  
-    ```sh
-    myenv\Scripts\activate
-    ```
-  - **Mac/Linux**:  
-    ```sh
-    source myenv/bin/activate
-    ```
-- Deactivate:  
-  ```sh
-  deactivate
-  ```
+* Application containerized using a custom **Dockerfile**.
+* Image scanned using **Trivy** to detect vulnerabilities before deployment.
+* All critical/high vulnerabilities are addressed during the build process.
 
-### 3. Dependencies Installation
-Install python dependencies by executing the following in your terminal:
-```sh
-pip install -r requirements.txt
+### ✅ Helm-Based Application Deployment
+
+* Helm chart located under `helm/python_proj/`.
+* Supports configuration overrides using `values.yaml`.
+* Application is deployed into a **dedicated namespace** to ensure isolation and resource control.
+
+### ✅ Monitoring Stack
+
+* Prometheus and Grafana deployed via the official **Kube Prometheus Stack** Helm chart.
+* Application-specific `ServiceMonitor` configured for metrics scraping.
+* Grafana dashboards created to monitor key application and pod-level metrics.
+
+---
+
+## 🚀 Deployment Workflow
+
+### 1. Provision Kubernetes Cluster
+
+Navigate to `kops-cluster/`:
+
+```bash
+terraform init
+terraform apply
 ```
 
-### 4. Frontend Dependencies
-- **Bootstrap (CSS & JavaScript)**:  
-  ```html
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  ```
+Ensure required AWS IAM policies, DNS setup (Route53), and S3 state bucket for Kops are pre-configured.
 
-- **Poppins Font (Google Fonts)**:
-  ```html
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  ```
+### 2. Deploy Application via Helm
 
-- **Font Awesome (Icons)**:
-  ```html
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  ```
-### 5. Environment Variables (.env File)
-Create a .env file in the root directory and add the following:
-```
-SECRET_KEY=your_secret_key_here
+```bash
+helm install todo-app ./helm/python_proj --namespace todo --create-namespace
 ```
 
-### 6. Other Technologies Used
-- **HTML5**
-- **CSS3**
-- **JavaScript**
+To upgrade:
 
-## Running the app
-To run the app in your local machine , run the following command after navigating to your project directory.  
-  
-```python -m app.run```
+```bash
+helm upgrade todo-app ./helm/python_proj --namespace todo
+```
 
-This will execute __run.py__ which is the entry point of the application
+### 3. Deploy Monitoring Stack
 
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install monitor prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+```
 
-## Features
+---
 
-- __User authentication__ : Signup, Login, Logout
-- __Real time form validation__ : Using fetch requests from js to the backend as soon as user inputs something  
-- __Add new todo__ 
-- __Update pre-existing todo__
-- __Mark todo as pending, success, failed__
-- __List the todos by :__
-    - __sorting__ : based on created time, deadline
-    - __filtering__ : based on status (success, pending, failed)
-- __Delete a todo__
-- __Different alerts when deadline is approaching* or already passed__
+## 📊 Observability & Metrics
 
+* Prometheus scrapes application metrics via `ServiceMonitor`.
+* Grafana dashboards can be imported or customized via UI.
+* Supports pod-level, node-level, and application-specific metrics.
 
-__*__  deadline approaching is defined as when the due time is approaching less than 1 hour . This feature can be custom for a user or a particular todo  in the next updates .
+---
+
+## 🛡️ Security Best Practices Implemented
+
+* Docker image vulnerability scan integrated using **Trivy**
+* Namespace-based resource isolation
+* No hardcoded secrets; sensitive values to be stored in **Kubernetes Secrets**
+* Infrastructure versioned and reproducible via Terraform
+
+---
+
+## 🧑‍💼 Maintained By
+
+**Suraj Mishra**
+DevOps Trainee
+Nagarro
+[LinkedIn](https://www.linkedin.com/in/suraj-mishra07/) • [GitHub](https://github.com/SurajMishraNagarro)
+
+---
