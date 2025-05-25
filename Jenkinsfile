@@ -97,11 +97,7 @@ pipeline {
                     sh """
                         
                         yq e '.image.tag = "${newImageTag}"' -i ${env.HELM_VALUES_FILE}
-                        helm upgrade ${env.APP_NAME} ${env.HELM_CHART_PATH} \\
-                            --namespace ${env.KUBERNETES_NAMESPACE} \\
-                            --wait \\
-                            --timeout=300s \\
-                            --set image.pullPolicy=Always
+                        helm upgrade ${env.APP_NAME} ${env.HELM_CHART_PATH} --namespace ${env.KUBERNETES_NAMESPACE} --wait --timeout=300s --set image.pullPolicy=Always
                         
                     """
                 }
@@ -150,8 +146,6 @@ pipeline {
                 }
             }
             
-            // Clean workspace
-            cleanWs()
         }
         
         success {
