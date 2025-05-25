@@ -2,28 +2,22 @@
 
 app:
   name: python-app
-
-namespace: python-app-ns 
-
+namespace: python-app-ns
 replicaCount: 3
-
 image:
   repository: surajmishra07/py_proj
   pullPolicy: Always
-  tag: "latest"
-
+  tag: "32-latest"
 service:
   portName: http
-  type: LoadBalancer 
+  type: LoadBalancer
   port: 9091
   targetPort: 9090
-
 persistence:
   enabled: true
   storageClass: gp2
   size: 1Gi
   mountPath: "/app/instance"
-
 resources:
   limits:
     cpu: 200m
@@ -31,7 +25,6 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
 serviceMonitor:
   enabled: true
   path: /metrics
@@ -43,6 +36,5 @@ serviceMonitor:
     app: kube-prometheus-stack
   release: prometheus-stack
   app: kube-prometheus-stack
-
 aws:
   region: us-east-1
