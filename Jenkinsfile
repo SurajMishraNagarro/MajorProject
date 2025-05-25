@@ -16,7 +16,7 @@ pipeline {
             steps {
                 echo '=== Pulling Code from Repository ==='
                 script {
-                    // Clean workspace and checkout code
+                    // Clean workspace 
                     sh '''
                         git config --global --add safe.directory "*"
                         git config --global --add safe.directory $(pwd)
