@@ -7,7 +7,7 @@ replicaCount: 3
 image:
   repository: surajmishra07/py_proj
   pullPolicy: Always
-  tag: "37-latest"
+  tag: "38-latest"
 service:
   portName: http
   type: LoadBalancer
